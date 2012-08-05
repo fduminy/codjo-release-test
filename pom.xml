@@ -180,10 +180,74 @@
                                 <artifactItem>
                                     <groupId>jcom</groupId>
                                     <artifactId>jcom-windows-x86</artifactId>
-                                    <outputDirectory>${basedir}\target\dll</outputDirectory>
+				    <outputDirectory>${basedir}/target/dll</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- download license -->
+	    <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>wagon-maven-plugin</artifactId>
+		<version>1.0-beta-3</version>
+		<executions>
+		    <execution>
+			<id>download-license</id>
+			<phase>generate-sources</phase>
+			<goals>
+			    <goal>download-single</goal>
+			</goals>
+			<configuration>
+			    <url>http://www.duminy.fr</url>
+			    <fromFile>codjo/copyright-notice.txt</fromFile>
+			    <toDir>target</toDir>
+			</configuration>
+		    </execution>
+		</executions>
+	    </plugin>	    
+	    <!-- replace license variables by their value -->
+	    <plugin>
+		<groupId>com.google.code.maven-replacer-plugin</groupId>
+		<artifactId>maven-replacer-plugin</artifactId>
+		<version>1.4.1</version>
+		<executions>
+		    <execution>
+			<phase>generate-sources</phase>
+			<goals>
+			    <goal>replace</goal>
+			</goals>                    
+		    </execution>
+		</executions>
+		<configuration>
+		    <ignoreMissingFile>false</ignoreMissingFile>
+		    <file>target/copyright-notice.txt</file>
+		    <outputFile>target/copyright-notice.txt</outputFile>
+		    <regex>false</regex>
+		    <token>$YEAR$</token>
+		    <value>2012</value>
+		</configuration>
+	    </plugin>	    
+	    <!-- apply license -->
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+		    <header>target/copyright-notice.txt</header>
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/.git/**</exclude>			            
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
