@@ -1,4 +1,6 @@
 package net.codjo.test.release.task.gui;
+import org.apache.tools.ant.Project;
+
 import junit.extensions.jfcunit.JFCTestCase;
 import junit.framework.TestCase;
 
@@ -23,7 +25,7 @@ public class StepListTest extends TestCase {
         stepList.addStep(step1);
         stepList.addStep(step2);
 
-        TestContext context = new TestContext(new JFCTestCase(""));
+        TestContext context = new TestContext(new Project());
         stepList.proceed(context);
 
         assertEquals("Step 2 du groupe 'test' (StepListTest$MockStep)",

@@ -29,21 +29,11 @@ public abstract class AbstractMatchingStep extends AbstractAssertStep {
     public void setMatching(String matching) {
         this.matching = matching;
     }
+    
+    public MatcherFactory getMatcherFactory() {
+		return matcherFactory;
+	}
 
-    protected boolean compareWithExpectedValue(String actualValue) {
-        Matcher matcher = matcherFactory.get(matching, actualValue);
-        return matcher.match(expected);
-    }
-
-    protected void assertExpected(String actualValue) {
-        if (!compareWithExpectedValue(actualValue)) {
-            throw new GuiAssertException("Composant " + getComponentName()
-                                         + " : attendu='" + expected
-                                         + "' obtenu='" + actualValue + "'");
-        }
-    }
-
-
-    protected abstract String getComponentName();
+    public abstract String getComponentName();
 
 }

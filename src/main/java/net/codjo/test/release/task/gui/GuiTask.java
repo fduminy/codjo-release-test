@@ -6,7 +6,8 @@
 package net.codjo.test.release.task.gui;
 import net.codjo.test.release.task.AgfTask;
 import net.codjo.test.release.task.Resource;
-import java.awt.Window;
+import net.codjo.test.release.task.gui.toolkit.GUIToolkitManager;
+
 import java.io.FileDescriptor;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -19,8 +20,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import junit.extensions.jfcunit.TestHelper;
-import junit.extensions.jfcunit.WindowMonitor;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.Commandline;
 public class GuiTask extends AgfTask implements Resource {
@@ -173,7 +172,7 @@ public class GuiTask extends AgfTask implements Resource {
 
 
     private void doExecuteNoSession() {
-        StepPlayer stepPlayer = new StepPlayer(getProject(), getProperty(TEST_DIRECTORY, false));
+    	StepPlayer stepPlayer = GUIToolkitManager.getGUIToolkit().createStepPlayer(getProject(), getProperty(TEST_DIRECTORY, false));
         try {
             startClient();
             stepPlayer.play(group);
@@ -182,7 +181,7 @@ public class GuiTask extends AgfTask implements Resource {
             throw ex;
         }
         catch (Exception ex) {
-            throw new GuiException("Impossible de démarrer l'IHM", ex);
+            throw new GuiException("Impossible de dï¿½marrer l'IHM", ex);
         }
         finally {
             stepPlayer.cleanUp();
@@ -196,8 +195,9 @@ public class GuiTask extends AgfTask implements Resource {
             guiContext = getGuiContext();
             if (guiContext == null) {
                 startClient();
-                guiContext = new GuiContext(
-                      new StepPlayer(getProject(), getProperty(TEST_DIRECTORY, false)));
+				guiContext = GUIToolkitManager.getGUIToolkit()
+						.createGuiContext(getProject(),
+								getProperty(TEST_DIRECTORY, false));
                 setGuiContext(guiContext);
             }
             else {
@@ -208,7 +208,7 @@ public class GuiTask extends AgfTask implements Resource {
             throw ex;
         }
         catch (Exception ex) {
-            throw new GuiException("Impossible de démarrer l'IHM", ex);
+            throw new GuiException("Impossible de dï¿½marrer l'IHM", ex);
         }
 
         guiContext.getStepPlayer().play(group);
@@ -228,7 +228,7 @@ public class GuiTask extends AgfTask implements Resource {
 
 
     private void setUpConfiguration() {
-        TestHelper.setKeyMapping(new FrenchKeyMapping());
+    	GUIToolkitManager.getGUIToolkit().setUpConfiguration();
         addReference(GUI_SESSIONS, new LinkedHashMap());
     }
 
@@ -266,22 +266,12 @@ public class GuiTask extends AgfTask implements Resource {
 
 
     private void showClient(GuiContext guiContext) {
-        for (Window window : guiContext.getWindows()) {
-            window.setVisible(true);
-        }
+    	GUIToolkitManager.getGUIToolkit().showClient(guiContext);
     }
 
 
     private void hideClient(GuiContext guiContext) {
-        List<Window> windows = new ArrayList<Window>();
-        for (Window window : WindowMonitor.getWindows()) {
-            if (window.isVisible()) {
-                window.setVisible(false);
-                windows.add(window);
-            }
-        }
-        guiContext.getWindows().clear();
-        guiContext.getWindows().addAll(windows);
+    	GUIToolkitManager.getGUIToolkit().hideClient(guiContext);
     }
 
 
@@ -310,9 +300,9 @@ public class GuiTask extends AgfTask implements Resource {
 
     private String[] getDefaultArguments() {
         List<String> argsList = new ArrayList<String>();
-        // Ajout des arguments nommés
+        // Ajout des arguments nommï¿½s
         addNamedArguments(argsList);
-        // Ajout des arguments ordonnés
+        // Ajout des arguments ordonnï¿½s
         if (argsList.size() == 0) {
             addOrderedArguments(argsList);
         }

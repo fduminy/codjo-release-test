@@ -1,6 +1,6 @@
 package net.codjo.test.release.task.gui.metainfo;
 
-import net.codjo.test.release.task.gui.AssertTableStep;
+import net.codjo.test.release.task.gui.toolkit.swing.AssertTableStep;
 import net.codjo.test.release.task.gui.GuiAssertException;
 import javax.swing.JTable;
 

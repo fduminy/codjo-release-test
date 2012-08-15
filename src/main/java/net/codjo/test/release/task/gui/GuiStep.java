@@ -5,7 +5,7 @@
  */
 package net.codjo.test.release.task.gui;
 /**
- * Interface représentant une étape de test IHM.
+ * Interface reprï¿½sentant une ï¿½tape de test IHM.
  */
 public interface GuiStep {
     public void proceed(TestContext context);

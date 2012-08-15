@@ -30,19 +30,22 @@ public abstract class StepList extends AbstractGuiStep {
 
 
     public void proceed(TestContext context) {
+    	proceedStepList(context);
+    }
+
+    public final void proceedStepList(TestContext context) {
         for (GuiStep step : stepList) {
             runBeforeStepProceed(context, step);
             step.proceed(context);
         }
     }
 
-
     protected void addStep(GuiStep step) {
         stepList.add(step);
     }
 
 
-    protected List<GuiStep> getStepList() {
+    public List<GuiStep> getStepList() {
         return stepList;
     }
 }

@@ -4,15 +4,14 @@
  * Copyright (c) 2001 AGF Asset Management.
  */
 package net.codjo.test.release.task.gui;
-import java.awt.Component;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import junit.extensions.jfcunit.finder.NamedComponentFinder;
+
+import net.codjo.test.release.task.gui.toolkit.GUIToolkitManager;
+
 /**
  * Classe permettant de Selectionner un onglet dans une {@link javax.swing.JTabbedPane}
  */
 public class SelectTabStep extends AbstractGuiStep {
-    private static final int INITIAL_INDEX_VALUE = -1;
+    public static final int INITIAL_INDEX_VALUE = -1;
     private String name;
     private String tabLabel;
     private int tabIndex = INITIAL_INDEX_VALUE;
@@ -46,71 +45,12 @@ public class SelectTabStep extends AbstractGuiStep {
         this.tabIndex = tabIndex;
     }
 
-
-    public void proceed(TestContext context) {
-        NamedComponentFinder finder = new NamedComponentFinder(JComponent.class, name);
-        Component comp = findOnlyOne(finder, context);
-        if (comp == null) {
-            throw new GuiFindException("Le composant '" + getName() + "' est introuvable.");
-        }
-        if (comp instanceof JTabbedPane) {
-            checkAttributesUsage();
-            if (tabIndex != INITIAL_INDEX_VALUE) {
-                tabLabel = String.valueOf(tabIndex);
-            }
-            final JTabbedPane tabbedPane = (JTabbedPane)comp;
-            final int index = findTabIndex(tabbedPane);
-            if (index == -1 || index >= tabbedPane.getTabCount()) {
-                throw new GuiFindException("L'onglet '" + tabLabel + "' est introuvable dans le composant '"
-                    + getName() + "'");
-            }
-
-            try {
-                runAwtCodeLater(context,
-                    new Runnable() {
-                        public void run() {
-                            tabbedPane.setSelectedIndex(index);
-                        }
-                    });
-            }
-            catch (Exception e) {
-                throw new GuiActionException("Impossible de sélectionner l'onglet.", e);
-            }
-        }
-        else {
-            throw new GuiConfigurationException("Type de composant non supporté : "
-                + comp.getClass().getName());
-        }
-    }
-
-
-    static String computeIllegalUsageOfAttributes(String name) {
+    static public String computeIllegalUsageOfAttributes(String name) {
         return "Les attributs 'tabIndex' et 'tabLabel' du composant '" + name
-        + "' ne peuvent pas être utilisés en même temps.";
+        + "' ne peuvent pas ï¿½tre utilisï¿½s en mï¿½me temps.";
     }
 
-
-    private void checkAttributesUsage() {
-        if (tabIndex != INITIAL_INDEX_VALUE && tabLabel != null) {
-            throw new GuiConfigurationException(computeIllegalUsageOfAttributes(getName()));
-        }
-    }
-
-
-    private int findTabIndex(JTabbedPane tabbedPane) {
-        if (tabLabel == null) {
-            return -1;
-        }
-        try {
-            return Integer.parseInt(tabLabel);
-        }
-        catch (NumberFormatException nfe) {
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (tabLabel.equals(tabbedPane.getTitleAt(i))) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
+	public void proceed(TestContext context) {
+		GUIToolkitManager.getGUIToolkit().proceed(this, context);
+	}
 }

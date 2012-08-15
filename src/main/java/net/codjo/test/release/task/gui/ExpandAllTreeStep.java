@@ -1,7 +1,7 @@
 package net.codjo.test.release.task.gui;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-import junit.extensions.jfcunit.finder.NamedComponentFinder;
+
+import net.codjo.test.release.task.gui.toolkit.GUIToolkitManager;
+
 /**
  *
  */
@@ -18,15 +18,7 @@ public class ExpandAllTreeStep extends AbstractGuiStep {
         this.name = name;
     }
 
-
-    public void proceed(TestContext context) {
-        NamedComponentFinder finder = new NamedComponentFinder(JTree.class, name);
-        JTree tree = (JTree)findOnlyOne(finder, context, 0);
-
-        if (tree == null) {
-            throw new GuiFindException("L'arbre '" + getName() + "' est introuvable.");
-        }
-
-        TreeUtils.expandSubtree(tree, new TreePath(tree.getModel().getRoot()));
-    }
+	public void proceed(TestContext context) {
+		GUIToolkitManager.getGUIToolkit().proceed(this, context);
+	}
 }

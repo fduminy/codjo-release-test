@@ -5,20 +5,16 @@
  */
 package net.codjo.test.release.task.gui;
 import net.codjo.test.release.task.Util;
-import static net.codjo.test.release.task.gui.TreeUtils.convertIntoTreePath;
-import java.awt.Component;
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-import junit.extensions.jfcunit.finder.NamedComponentFinder;
+import net.codjo.test.release.task.gui.toolkit.GUIToolkitManager;
+
 /**
- * Permet de simuler des éditions dans des cellules de JTable.
+ * Permet de simuler des ï¿½ditions dans des cellules de JTable.
  *
  * @version $Revision: 1.8 $
  */
 public class EditCellStep extends StepList {
-    public static final String NO_NAME_HAS_BEEN_SET = "Aucun nom de composant n'a été spécifié.";
-    private static final int INITIAL_ROW_VALUE = -1;
+    public static final String NO_NAME_HAS_BEEN_SET = "Aucun nom de composant n'a ï¿½tï¿½ spï¿½cifiï¿½.";
+    public static final int INITIAL_ROW_VALUE = -1;
 
     private int row = INITIAL_ROW_VALUE;
     private String column;
@@ -27,6 +23,10 @@ public class EditCellStep extends StepList {
     private AbstractTableEditionStep editionStep;
 
 
+    public AbstractTableEditionStep getEditionStep() {
+		return editionStep;
+	}
+    
     public int getRow() {
         return row;
     }
@@ -184,137 +184,22 @@ public class EditCellStep extends StepList {
 
     @Override
     public void proceed(TestContext context) {
-        Component comp = findComponent(context, JTable.class);
-        if (comp == null) {
-            comp = findComponent(context, JTree.class);
-        }
-
-        if (comp == null) {
-            throw new GuiFindException(computeComponentNotFoundMessage());
-        }
-
-        if (!comp.isEnabled()) {
-            throw new GuiConfigurationException("Le composant '" + getName() + "' n'est pas actif.");
-        }
-
-        Component editorComponent;
-        try {
-            if (comp instanceof JTable) {
-                editorComponent = proceedTable((JTable)comp, context);
-            }
-            else if (comp instanceof JTree) {
-                editorComponent = proceedTree((JTree)comp);
-            }
-            else {
-                throw new GuiConfigurationException("Type de composant non supporté : "
-                                                    + comp.getClass().getName());
-            }
-        }
-        catch (GuiException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            throw new GuiActionException("Impossible d'éditer le composant.", e);
-        }
-
-        context.setCurrentComponent(editorComponent);
-        if (editionStep != null) {
-            editionStep.setName(getName());
-        }
-        super.proceed(context);
-        context.setCurrentComponent(null);
+    	GUIToolkitManager.getGUIToolkit().proceed(this, context);
     }
-
-
-    private String computeComponentNotFoundMessage() {
-        if (getName() == null) {
-            return NO_NAME_HAS_BEEN_SET;
-        }
-        else {
-            return "Le composant '" + getName() + "' est introuvable.";
-        }
-    }
-
-
-    private Component findComponent(TestContext context, Class aClass) {
-        NamedComponentFinder finder = new NamedComponentFinder(aClass, getName());
-        return findOnlyOne(finder, context);
-    }
-
-
-    private Component proceedTree(JTree tree) throws InterruptedException {
-        if (getRow() != INITIAL_ROW_VALUE) {
-            throw new GuiConfigurationException("L'attribut row n'est pas supporté sur les arbres.");
-        }
-        if (getColumn() != null) {
-            throw new GuiConfigurationException("L'attribut column n'est pas supporté sur les arbres.");
-        }
-        if (getPath() == null) {
-            throw new GuiConfigurationException("Le path n'a pas été renseigné.");
-        }
-
-        if (!tree.isEditable()) {
-            throw new GuiConfigurationException("L'arbre n'est pas éditable.");
-        }
-        final TreePath treePath = convertIntoTreePath(tree, getPath(), TreeStepUtils.getConverter(getMode()));
-        tree.startEditingAtPath(treePath);
-
-        Object node = treePath.getLastPathComponent();
-
-        boolean isLeaf = tree.getModel().isLeaf(node);
-        boolean expanded = tree.isExpanded(treePath);
-        int pathRow = tree.getRowForPath(treePath);
-
-        return tree.getCellEditor().getTreeCellEditorComponent(tree, node, true, expanded, isLeaf, pathRow);
-    }
-
-
-    private Component proceedTable(final JTable table, TestContext context) {
-        if (getPath() != null) {
-            throw new GuiConfigurationException("L'attribut path n'est pas supporté sur les tables.");
-        }
-        if (getMode() != null) {
-            throw new GuiConfigurationException("L'attribut mode n'est pas supporté sur les tables.");
-        }
-
-        final int realColumn = TableTools.searchColumn(table, column);
-        TableTools.checkTableCellExists(table, row, realColumn);
-        if (!table.isCellEditable(row, realColumn)) {
-            throw new GuiConfigurationException(computeNotEditableCellMessage(column));
-        }
-
-        final boolean[] editionIsPossible = new boolean[]{false};
-        try {
-            runAwtCode(context, new Runnable() {
-                public void run() {
-                    editionIsPossible[0] = table.editCellAt(row, realColumn);
-                    if (!editionIsPossible[0]) {
-                        throw new GuiConfigurationException(computeNotEditableCellMessage(column));
-                    }
-                }
-            });
-        }
-        catch (Exception error) {
-            throw new GuiException("Impossible d'editer la table '" + table.getName() + "'", error);
-        }
-
-        return table.getEditorComponent();
-    }
-
 
     static String computeNotEditableCellMessage(String columnName) {
-        return "La colonne '" + columnName + "' n'est pas éditable.";
+        return "La colonne '" + columnName + "' n'est pas ï¿½ditable.";
     }
 
 
-    static String computeStepAlreadyDefinedMessage(AbstractTableEditionStep step) {
-        return "Une step '" + Util.computeClassName(step.getClass()) + "' est déjà définie.";
+    static public String computeStepAlreadyDefinedMessage(AbstractTableEditionStep step) {
+        return "Une step '" + Util.computeClassName(step.getClass()) + "' est dï¿½jï¿½ dï¿½finie.";
     }
 
 
-    static String computeBadTagOrderMessage(AbstractTableEditionStep step) {
+    static public String computeBadTagOrderMessage(AbstractTableEditionStep step) {
         return "La step '" + Util.computeClassName(step.getClass())
-               + "' doit être la dernière balise du bloc.";
+               + "' doit ï¿½tre la derniï¿½re balise du bloc.";
     }
 
 

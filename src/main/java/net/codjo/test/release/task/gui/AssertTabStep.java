@@ -1,7 +1,5 @@
 package net.codjo.test.release.task.gui;
-import java.awt.Component;
-import javax.swing.JTabbedPane;
-import junit.extensions.jfcunit.finder.NamedComponentFinder;
+
 /**
  *
  */
@@ -12,53 +10,6 @@ public class AssertTabStep extends AbstractAssertStep {
     private boolean selected = false;
     private boolean selectedAttributeIsSet = false;
     private Boolean enabled;
-
-
-    @Override
-    protected void proceedOnce(TestContext context) {
-        NamedComponentFinder finder = new NamedComponentFinder(JTabbedPane.class, name);
-        Component comp = findOnlyOne(finder, context, 0);
-
-        if (comp == null) {
-            throw new GuiFindException(
-                  "Le conteneur d'onglets (JTabbedPane) portant le nom " + name + " est introuvable");
-        }
-
-        JTabbedPane tabbedPane = (JTabbedPane)comp;
-
-        int indexFound = -1;
-
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            String title = tabbedPane.getTitleAt(i);
-            if (title.equals(tabLabel)) {
-                indexFound = i;
-                break;
-            }
-        }
-        if (indexFound == -1) {
-            throw new GuiFindException("L'onglet portant le nom " + tabLabel + " est introuvable");
-        }
-        else if (tabIndex != -1 && indexFound != tabIndex) {
-            throw new GuiFindException("L'onglet " + tabLabel + " en position " + indexFound
-                                       + " ne se trouve pas en position " + tabIndex);
-        }
-
-        if (selectedAttributeIsSet) {
-            boolean isSelected = (indexFound == tabbedPane.getSelectedIndex());
-            if (selected && !isSelected) {
-                throw new GuiAssertException("L'onglet '" + tabLabel + "' n'est pas sélectionné.");
-            }
-            if (!selected && isSelected) {
-                throw new GuiAssertException("L'onglet '" + tabLabel + "' est sélectionné.");
-            }
-        }
-
-        if (enabled != null && enabled != tabbedPane.isEnabledAt(indexFound)) {
-            throw new GuiAssertException(
-                  "L'onglet '" + tabLabel + "' est ou n'est pas actif contrairement à ce qui a été spécifié");
-        }
-    }
-
 
     public String getName() {
         return name;
@@ -101,7 +52,19 @@ public class AssertTabStep extends AbstractAssertStep {
     }
 
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+    public boolean isSelected() {
+		return selected;
+	}
+
+
+    public boolean isSelectedAttributeIsSet() {
+		return selectedAttributeIsSet;
+	}
+
+
+    public Boolean getEnabled() {
+		return enabled;
+	}
+    
+    
 }

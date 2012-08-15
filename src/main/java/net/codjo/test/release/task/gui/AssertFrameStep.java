@@ -4,12 +4,10 @@
  * Copyright (c) 2001 AGF Asset Management.
  */
 package net.codjo.test.release.task.gui;
-import net.codjo.test.release.task.gui.finder.FrameFinder;
 import net.codjo.test.release.task.gui.matcher.MatcherFactory;
-import java.awt.Component;
-import junit.extensions.jfcunit.finder.Finder;
+
 /**
- * Classe permettant de vérifier l'état d'une JInternalFrame.
+ * Classe permettant de vï¿½rifier l'ï¿½tat d'une JInternalFrame.
  */
 public class AssertFrameStep extends AbstractAssertStep {
     private String title;
@@ -40,28 +38,8 @@ public class AssertFrameStep extends AbstractAssertStep {
     public void setMatching(String matching) {
         this.matching = matching;
     }
-
-
-    @Override
-    protected int getFinderOperation() {
-        return MatcherFactory.getFinderOperationFromMatching(matching);
-    }
-
-
-    @Override
-    protected void proceedOnce(TestContext testContext) {
-        String parsedTitle = testContext.replaceProperties(getTitle());
-        Finder finder = new FrameFinder(parsedTitle);
-        Component frame = findOnlyOne(finder, testContext, 0);
-        if (closed) {
-            if (frame != null) {
-                throw new GuiAssertException("La fenêtre '" + parsedTitle + "' n'est pas fermée");
-            }
-        }
-        else {
-            if (frame == null) {
-                throw new GuiAssertException("La fenêtre '" + parsedTitle + "' n'est pas ouverte");
-            }
-        }
-    }
+    
+    public String getMatching() {
+		return matching;
+	}
 }
